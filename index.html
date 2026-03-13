@@ -9,32 +9,364 @@
 body{
 margin:0;
 font-family:Segoe UI;
-background:linear-gradient(120deg,#ff9bd3,#ffc3e6,#ffd8f0);
-background-size:400% 400%;
-animation:bgMove 10s infinite alternate;
-text-align:center;
-overflow-x:hidden;
-}
-
-@keyframes bgMove{
-0%{background-position:0%}
-100%{background-position:100%}
-}
-
-h1{
-margin-top:40px;
+background:black;
 color:white;
-text-shadow:0 0 20px #ff4da6;
+text-align:center;
+overflow:hidden;
+}
+
+/* star background */
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
 }
 
 /* intro */
 
-.intro{
-margin-top:80px;
-font-size:22px;
-color:white;
-animation:fade 3s;
+#intro{
+margin-top:150px;
+animation:fadeIn 3s;
 }
+
+@keyframes fadeIn{
+from{opacity:0}
+to{opacity:1}
+}
+
+.name{
+font-size:60px;
+color:#ff4da6;
+text-shadow:0 0 20px #ff4da6;
+}
+
+/* gift */
+
+.gift{
+width:180px;
+height:180px;
+margin:80px auto;
+position:relative;
+cursor:pointer;
+animation:drop 1.5s;
+}
+
+@keyframes drop{
+0%{transform:translateY(-500px)}
+100%{transform:translateY(0)}
+}
+
+.box{
+width:180px;
+height:180px;
+background:#ff4da6;
+border-radius:12px;
+}
+
+.lid{
+width:180px;
+height:40px;
+background:#ff1a8c;
+position:absolute;
+top:-40px;
+border-radius:10px;
+transition:transform 1s;
+transform-origin:bottom;
+}
+
+/* cake */
+
+.cake{
+display:none;
+margin:60px auto;
+width:220px;
+position:relative;
+}
+
+.layer{
+height:60px;
+background:#ff7aa2;
+border-radius:10px;
+margin-top:6px;
+}
+
+.icing{
+height:20px;
+background:white;
+border-radius:10px;
+position:relative;
+top:-10px;
+}
+
+/* candle */
+
+.candle{
+width:16px;
+height:60px;
+background:white;
+position:absolute;
+left:102px;
+top:-60px;
+cursor:pointer;
+}
+
+.flame{
+width:20px;
+height:28px;
+background:radial-gradient(circle,yellow,orange,red);
+border-radius:50%;
+position:absolute;
+top:-25px;
+left:-2px;
+animation:flicker .2s infinite;
+}
+
+@keyframes flicker{
+0%{transform:scale(1)}
+50%{transform:scale(1.2)}
+100%{transform:scale(.9)}
+}
+
+/* balloons */
+
+.balloon{
+position:fixed;
+bottom:-120px;
+width:60px;
+height:80px;
+border-radius:50%;
+animation:rise 8s linear infinite;
+}
+
+@keyframes rise{
+0%{transform:translateY(0)}
+100%{transform:translateY(-120vh)}
+}
+
+/* gallery */
+
+.gallery{
+display:none;
+margin-top:40px;
+}
+
+.gallery img{
+width:300px;
+border-radius:10px;
+}
+
+/* letter */
+
+.letter{
+display:none;
+width:70%;
+margin:40px auto;
+font-size:20px;
+line-height:1.6;
+background:rgba(255,255,255,.15);
+padding:30px;
+border-radius:12px;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+
+<div id="intro">
+
+<h2>A little universe made for</h2>
+
+<div class="name">[HER NAME]</div>
+
+</div>
+
+<audio autoplay loop>
+<source src="song.mp3">
+</audio>
+
+<!-- gift -->
+
+<div class="gift" onclick="openGift()">
+
+<div class="lid" id="lid"></div>
+
+<div class="box"></div>
+
+</div>
+
+<!-- cake -->
+
+<div class="cake" id="cake">
+
+<div class="candle" onclick="blow()">
+<div class="flame" id="flame"></div>
+</div>
+
+<div class="icing"></div>
+<div class="layer"></div>
+<div class="layer"></div>
+
+</div>
+
+<!-- photos -->
+
+<div class="gallery" id="gallery">
+<img id="photo" src="photo1.jpg">
+</div>
+
+<!-- letter -->
+
+<div class="letter" id="letter"></div>
+
+<script>
+
+/* star background */
+
+const canvas=document.getElementById("stars")
+const ctx=canvas.getContext("2d")
+
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+
+let stars=[]
+
+for(let i=0;i<200;i++){
+stars.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:Math.random()*2
+})
+}
+
+function drawStars(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+stars.forEach(s=>{
+ctx.beginPath()
+ctx.arc(s.x,s.y,s.size,0,Math.PI*2)
+ctx.fillStyle="white"
+ctx.fill()
+})
+
+requestAnimationFrame(drawStars)
+
+}
+
+drawStars()
+
+/* open gift */
+
+function openGift(){
+
+document.getElementById("lid").style.transform="rotateX(-120deg)"
+
+setTimeout(()=>{
+
+document.querySelector(".gift").style.display="none"
+document.getElementById("cake").style.display="block"
+spawnBalloons()
+
+},900)
+
+}
+
+/* balloons */
+
+function spawnBalloons(){
+
+for(let i=0;i<15;i++){
+
+let b=document.createElement("div")
+
+b.className="balloon"
+
+b.style.left=Math.random()*100+"vw"
+
+b.style.background="hsl("+Math.random()*360+",70%,70%)"
+
+b.style.animationDuration=(5+Math.random()*3)+"s"
+
+document.body.appendChild(b)
+
+}
+
+}
+
+/* blow candle */
+
+function blow(){
+
+document.getElementById("flame").style.display="none"
+
+startGallery()
+
+typeLetter()
+
+}
+
+/* gallery */
+
+let photos=["photo1.jpg","photo2.jpg","photo3.jpg","photo4.jpg"]
+
+let index=0
+
+function startGallery(){
+
+document.getElementById("gallery").style.display="block"
+
+setInterval(()=>{
+
+index=(index+1)%photos.length
+document.getElementById("photo").src=photos[index]
+
+},3000)
+
+}
+
+/* letter typing */
+
+let text=`Dear [HER NAME],
+
+Some people make the world brighter just by being in it.
+
+You are one of those people.
+
+Your smile makes ordinary days special.
+
+I made this little universe just to celebrate you.
+
+Happy Birthday.
+
+— Arvind ❤️`
+
+let i=0
+
+function typeLetter(){
+
+document.getElementById("letter").style.display="block"
+
+let t=setInterval(()=>{
+
+document.getElementById("letter").innerHTML+=text[i]
+
+i++
+
+if(i>=text.length) clearInterval(t)
+
+},40)
+
+}
+
+</script>
+
+</body>
+</html>}
 
 @keyframes fade{
 from{opacity:0; transform:translateY(20px)}
